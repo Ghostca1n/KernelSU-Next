@@ -120,6 +120,46 @@ fun getModuleCount(): Int {
     }.getOrElse { return 0 }
 }
 
+private fun getSuSFSPath(): String {
+    return ksuApp.applicationInfo.nativeLibraryDir + File.separator + "libsusfs.so"
+}
+
+fun getSuSFS(): String {
+    val shell = getRootShell()
+    val result = ShellUtils.fastCmd(shell, "${getSuSFSPath()} support")
+    return result
+}
+
+fun getSuSFSVersion(): String {
+    val shell = getRootShell()
+    val result = ShellUtils.fastCmd(shell, "${getSuSFSPath()} version")
+    return result
+}
+
+fun getSuSFSVariant(): String {
+    val shell = getRootShell()
+    val result = ShellUtils.fastCmd(shell, "${getSuSFSPath()} variant")
+    return result
+}
+
+fun susfsSUSSU_0(): String {
+    val shell = getRootShell()
+    val result = ShellUtils.fastCmd(shell, "${getSuSFSPath()} sus_su 0")
+    return result
+}
+
+fun susfsSUSSU_1(): String {
+    val shell = getRootShell()
+    val result = ShellUtils.fastCmd(shell, "${getSuSFSPath()} sus_su 2")
+    return result
+}
+
+fun susfsSUSSU_Mode(): String {
+    val shell = getRootShell()
+    val result = ShellUtils.fastCmd(shell, "${getSuSFSPath()} sus_su show_working_mode")
+    return result
+}
+
 fun getSuperuserCount(): Int {
     return Natives.allowList.size
 }
@@ -139,6 +179,13 @@ fun uninstallModule(id: String): Boolean {
     val cmd = "module uninstall $id"
     val result = execKsud(cmd, true)
     Log.i(TAG, "uninstall module $id result: $result")
+    return result
+}
+
+fun restoreModule(id: String): Boolean {
+    val cmd = "module restore $id"
+    val result = execKsud(cmd, true)
+    Log.i(TAG, "restore module $id result: $result")
     return result
 }
 
@@ -179,7 +226,7 @@ fun flashModule(
         }
         val cmd = "module install ${file.absolutePath}"
         val result = flashWithIO("${getKsuDaemonPath()} $cmd", onStdout, onStderr)
-        Log.i("KernelSU", "install module $uri result: $result")
+        Log.i("KernelSU-Next", "install module $uri result: $result")
 
         file.delete()
 
@@ -207,7 +254,7 @@ fun runModuleAction(
 
     val result = shell.newJob().add("${getKsuDaemonPath()} module action $moduleId")
         .to(stdoutCallback, stderrCallback).exec()
-    Log.i("KernelSU", "Module runAction result: $result")
+    Log.i("KernelSU-Next", "Module runAction result: $result")
 
     return result.isSuccess
 }
@@ -301,7 +348,7 @@ fun installBoot(
     cmd += " -o $downloadsDir"
 
     val result = flashWithIO("${getKsuDaemonPath()} $cmd", onStdout, onStderr)
-    Log.i("KernelSU", "install boot result: ${result.isSuccess}")
+    Log.i("KernelSU-Next", "install boot result: ${result.isSuccess}")
 
     bootFile?.delete()
     lkmFile?.delete()
@@ -397,7 +444,7 @@ fun getAppProfileTemplate(id: String): String {
 fun setAppProfileTemplate(id: String, template: String): Boolean {
     val shell = getRootShell()
     val escapedTemplate = template.replace("\"", "\\\"")
-    val cmd = """${getKsuDaemonPath()} profile set-template "$id" "$escapedTemplate'""""
+    val cmd = """${getKsuDaemonPath()} profile set-template "$id" "$escapedTemplate"""""
     return shell.newJob().add(cmd)
         .to(ArrayList(), null).exec().isSuccess
 }
