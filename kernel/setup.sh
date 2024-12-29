@@ -39,7 +39,7 @@ perform_cleanup() {
 # Sets up or update KernelSU-Next environment
 setup_kernelsu() {
     echo "[+] Setting up KernelSU-Next..."
-    test -d "$GKI_ROOT/KernelSU-Next" || git clone https://github.com/rifsxd/KernelSU-Next && echo "[+] Repository cloned."
+    test -d "$GKI_ROOT/KernelSU-Next" || git clone https://github.com/Ghostca1n/KernelSU-Next && echo "[+] Repository cloned."
     cd "$GKI_ROOT/KernelSU-Next"
     git stash && echo "[-] Stashed current changes."
     if [ "$(git status | grep -Po 'v\d+(\.\d+)*' | head -n1)" ]; then
@@ -47,9 +47,9 @@ setup_kernelsu() {
     fi
     git pull && echo "[+] Repository updated."
     if [ -z "${1-}" ]; then
-        git checkout "$(git describe --abbrev=0 --tags)" && echo "[-] Checked out latest tag."
+         echo "[-] Checked out latest tag."
     else
-        git checkout "$1" && echo "[-] Checked out $1." || echo "[-] Checkout default branch"
+         echo "[-] Checkout default branch"
     fi
     cd "$DRIVER_DIR"
     ln -sf "$(realpath --relative-to="$DRIVER_DIR" "$GKI_ROOT/KernelSU-Next/kernel")" "kernelsu" && echo "[+] Symlink created."
